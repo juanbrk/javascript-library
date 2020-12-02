@@ -1,19 +1,24 @@
-function Book(title, author, numPages){
+function Book(title, author, numPages, isRead = false){
     this.title = title, 
     this.author = author, 
     this.numPages = numPages,
-    this.isRead =  false;
+    this.isRead =  isRead;
     
     this.info = () => {
         let read = this.isRead ? 'read' : 'not read yet'
         return `${this.title} by ${this.author}, ${this.numPages} pages, ${read} `;
     } 
 }
+//elements
+const albumRow = document.getElementById('albumRow');
+const submitBtn = document.getElementById('submit-btn');
 
 // variables
 let myLibrary = [];
-const albumRow = document.getElementById('albumRow');
 
+
+//events
+submitBtn.addEventListener('click', ()  => createNewBook());
 
 function addBookToLibrary(newBook){
     myLibrary.push(newBook);
@@ -44,22 +49,25 @@ addBookToLibrary(aBook);
 
 
 function populateAlbum(){
-    console.log(myLibrary.length)
     for (let i = 0; i < myLibrary.length; i++) {
-        const colElement = document.createElement('div');
-        const cardElement = document.createElement('div'); 
-
-        colElement.classList.add("col-md-4");
-        cardElement.classList.add("card", "mb-4", "shadow-sm");
-
-        albumRow.appendChild(colElement);
-        colElement.appendChild(cardElement)
-        
-        let book = myLibrary[i]
-
-        let cardBody = createCard(book);
-        cardElement.appendChild(cardBody);
+        let book = myLibrary[i];
+        const bookRender = renderBook(book);
+        albumRow.appendChild(bookRender);
     }
+}
+
+function createCardElement(){
+    const cardElement = document.createElement('div'); 
+    cardElement.classList.add("card", "mb-4", "shadow-sm");
+
+    return cardElement;
+}
+
+function createColElement(){
+    const colElement = document.createElement('div');
+    colElement.classList.add("col-md-4");
+
+    return colElement;
 }
 
 function createCardFooter(book){
@@ -91,6 +99,67 @@ function createCardFooter(book){
 
 }
 
+function validateFields( bookTitle, bookAuthor, bookPages ){
+    let emptyString = '';
+    let faultyField = '';    
+    let isValid = true;
+    if (emptyString===bookTitle ){
+        isValid = false;
+        faultyField = 'title';
+    } 
+    
+    if ( emptyString===bookAuthor && isValid) {
+        isValid = false;
+        faultyField = 'author';
+    }
+    
+    if ( isValid) {
+        //validate page numbers field input
+        isValid =  emptyString===bookPages ? false : validateNumbersOnlyField(bookPages) ;
+        faultyField = isValid ? '' : 'pages';
+    }
+
+    return faultyField;
+
+}
+
+/**
+ * For form fields that are type=text but meant to be for numbers (4ex: page numbers)
+ * checks if only valid [0-9] characters have been entered
+ * 
+ * @param {String} inputValue field text value
+ */
+function validateNumbersOnlyField(inputValue){
+    const regex = /[0-9]|\./;
+    return regex.test(inputValue);    
+}
+
+function createNewBook(){
+    let bookTitle = document.getElementById('book-title').value;
+    let bookAuthor = document.getElementById('book-author').value;
+    let bookPages = document.getElementById('book-pages').value;
+    // read as in 'I have read this book'. !read as in 'do you like to read?' English parafernalia
+    let readBook = document.getElementById('read-book-check').checked;
+
+    const faultyField = validateFields(bookTitle,bookAuthor, bookPages);
+    let areFieldsValid = faultyField.length == 0;
+
+    if (!areFieldsValid){
+        alert(`Please provide a valid value for ${faultyField}`);
+    } else {
+        let aBook = new Book(bookTitle, bookAuthor, Number(bookPages), readBook);
+        addBookToLibrary(aBook);
+        // LO DE ABAJO NO ESTARÁ POR SIEMPRE AQUI ------------------------------
+        // Reemplazar por un metodo que renderice nuevamente la colección entera y no sólo 
+        //este único libro
+        debugger;
+        const bookCard = renderBook(aBook);
+        albumRow.appendChild(bookCard);
+        // LO DE ARRIBA NO ESTARÁ POR SIEMPRE AQUI ------------------------------
+        clearFields();
+    }
+}
+
 /**
  * append multiple child elements to one parent element.
  * @param {Object} parentElement element to append childs to
@@ -101,6 +170,25 @@ function appendChild(parentElement, childs){
         parentElement.innerHTML += childs[i].outerHTML;        
     }
     return parentElement;
+}
+
+function clearFields(){
+    document.getElementById("new-book-form").reset();
+}
+
+/**
+ * creates book card and displays it 
+ * 
+ * @param {Object} book book to render
+ */
+function renderBook(book){
+    const bookRender = createColElement();
+    const cardElement = createCardElement();
+    const cardBody = createCard(book);
+    cardElement.appendChild(cardBody);
+    bookRender.appendChild(cardElement);
+
+    return bookRender;
 }
 
 function createCard(book){
