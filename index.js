@@ -152,12 +152,20 @@ function createNewBook(){
         // LO DE ABAJO NO ESTARÁ POR SIEMPRE AQUI ------------------------------
         // Reemplazar por un metodo que renderice nuevamente la colección entera y no sólo 
         //este único libro
-        debugger;
         const bookCard = renderBook(aBook);
         albumRow.appendChild(bookCard);
         // LO DE ARRIBA NO ESTARÁ POR SIEMPRE AQUI ------------------------------
+
+        //scroll view to focus view on new book
+        scrollToFocusOnAddedBook(bookCard)
         clearFields();
     }
+}
+
+function scrollToFocusOnAddedBook(newBookCard){
+    let bookId = newBookCard.id;
+    let anchor = document.querySelector(`[id='${bookId}']`); 
+    anchor. scrollIntoView();
 }
 
 /**
@@ -187,6 +195,8 @@ function renderBook(book){
     const cardBody = createCard(book);
     cardElement.appendChild(cardBody);
     bookRender.appendChild(cardElement);
+    bookRender.id = (book.numPages).toString();
+
 
     return bookRender;
 }
