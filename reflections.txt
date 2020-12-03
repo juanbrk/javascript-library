@@ -1,0 +1,19 @@
+- Referencing an id that's numeric (id=54) it's possible and it requires some
+ extra handling. To query the element you should do: 
+    document.querySelector(`[id='${bookId}']`
+- I can access an element's parent by accessing offsetParent. 
+- In order to be able to remove book card as well as book from library array, I had to bind both
+objects ( the rendered card with the book in the array). I decided I would do this with a dataset
+attribute on the card element with the index of the book in the array, as value. In card element: 
+data-book-index = bookInArrayIndex. Then I realized that this would be a bad idea. Why? Because 
+everytime a book is removed, the indexes of the remaining books in the arrray are changed while 
+the dataset attribute inside the element still points to the previous index. In order for this 
+idea to thrive, once removed a book, i would have to update every card element dataset attribute
+with the new index that the object it refers to occupies inside the array. Since this involves a 
+lot of effort, I decided to create a unique ID for every book Object, and asign that value to a 
+dataset attribute. This way, whenever a book is removed, the pointer of every remaining element 
+is still valid;
+
+- When adding data attributes, in javascript the name of the attribute will correspond with that of
+the HTML element but in camel case. Without dashes, nor dots, etc. 
+
