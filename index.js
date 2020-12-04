@@ -139,7 +139,7 @@ function createCardElement(){
  * adds a new div that will store the book card
  */
 function createColElement(){
-    return createElementWithClass('div', ["col-md-4"]);
+    return createElementWithClass('div', ["col-md-4", "col-sm-12"]);
 }
 
 function createCardFooter(book){
