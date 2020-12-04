@@ -17,13 +17,55 @@ const submitBtn = document.getElementById('submit-btn');
 // variables
 let myLibrary = [];
 
-populateAlbum();
+checkLocalStorage();
 
 const removeBtnList = Array.from(document.querySelectorAll('button[class="btn btn-sm btn-danger"]'));
 
 
 //events
 submitBtn.addEventListener('click', ()  => createNewBook());
+
+/**
+ * test whether the storage object has already been populated (i.e., the page was 
+ * previously accessed)
+ */
+function checkLocalStorage(){
+    if(!localStorage.getItem('myLibrary')) {
+        populateStorage();
+      } else {
+        loadBooks();
+        renderBooks();
+      }
+}
+
+/**
+ * Display books on cards
+ */
+function renderBooks(){
+    
+    for (let i = 0; i < myLibrary.length; i++) {
+        let book = myLibrary[i];
+        const bookRender = renderBook(book);
+        albumRow.appendChild(bookRender);
+    }
+}
+
+/**
+ * Load localStorage when app is first accessed
+ */
+function populateStorage(){
+    populateLibrary();
+    localStorage.setItem('myLibrary', JSON.stringify(myLibrary));
+}
+
+/**
+ * Retrieve books from localStorage
+ */
+function loadBooks(){
+    // Retrieve the object from storage
+    let retrievedLibrary = localStorage.getItem('myLibrary');
+    myLibrary = JSON.parse(retrievedLibrary);
+}
 
 function addBookToLibrary(newBook){
     myLibrary.push(newBook);
@@ -40,7 +82,7 @@ function removeBook(buttonPressed){
     const bookToRemoveIndex = myLibrary.findIndex( book => book.id == bookToRemoveId );
     //TODO: ask for confirmation
     myLibrary.splice(bookToRemoveIndex, 1);
-
+    updateLocalStorageLibrary();
     cardElementToRemove.remove(); 
 }
 
@@ -61,7 +103,10 @@ function createUniqueId(){
 
 
 
-function populateAlbum(){
+/**
+ * On first access to app, populate library in order to populate localStorage 
+ */
+function populateLibrary(){
     let aBook = new Book('Harry Potter', 'J.K. Rowling', 845, false);
     addBookToLibrary(aBook);
     aBook = new Book('Arianna Jenkins and Reverse-engineered asynchronous array ', 'Valentine Schneider', 97250, false);
@@ -84,12 +129,6 @@ function populateAlbum(){
     addBookToLibrary(aBook);
     aBook = new Book('Vida Von and Persistent optimizing pricing structure ', 'Catherine Roberts', 17763, true);
     addBookToLibrary(aBook);
-
-    for (let i = 0; i < myLibrary.length; i++) {
-        let book = myLibrary[i];
-        const bookRender = renderBook(book);
-        albumRow.appendChild(bookRender);
-    }
 }
 
 function createCardElement(){
@@ -182,7 +221,7 @@ function validateNumbersOnlyField(inputValue){
 
 /**
  * User can add new books to library by pressing the '+ add a button'  Button
- * and we have to create it and display it properly
+ * and we have to create, display and localStore it properly
  */
 function createNewBook(){
     let bookTitle = document.getElementById('book-title').value;
@@ -199,20 +238,26 @@ function createNewBook(){
     } else {
         let aBook = new Book(bookTitle, bookAuthor, Number(bookPages), readBook);
         addBookToLibrary(aBook);
+        
         // LO DE ABAJO NO ESTARÁ POR SIEMPRE AQUI ------------------------------
         // Reemplazar por un metodo que renderice nuevamente la colección entera y no sólo 
         //este único libro
         const bookCard = renderBook(aBook);
         albumRow.appendChild(bookCard);
         // LO DE ARRIBA NO ESTARÁ POR SIEMPRE AQUI ------------------------------
-
-        //scroll view to focus view on new book
-        scrollToFocusOnAddedBook(bookCard)
+        
+        updateLocalStorageLibrary();
+        focusOnAddedBook(bookCard);
+        
         clearFields();
     }
 }
 
-function scrollToFocusOnAddedBook(newBookCard){
+function updateLocalStorageLibrary(){
+    localStorage.setItem('myLibrary', JSON.stringify(myLibrary));
+}
+
+function focusOnAddedBook(newBookCard){
     let bookId = newBookCard.id;
     let anchor = document.querySelector(`[id='${bookId}']`); 
     anchor. scrollIntoView();
@@ -310,6 +355,8 @@ function markBookAsRead(cardButtonPressed){
         } 
         return book
     } );
+
+    updateLocalStorageLibrary();
 
 }
 
