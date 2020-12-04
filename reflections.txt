@@ -17,3 +17,12 @@ is still valid;
 - When adding data attributes, in javascript the name of the attribute will correspond with that of
 the HTML element but in camel case. Without dashes, nor dots, etc. 
 
+
+JAV-LIB-7: Persist data
+
+    - localStorage creates Storage objects that are simple key-value stores, similar to objects, but 
+    they stay intact through page loads.
+    - The StorageEvent is fired whenever a change is made to the Storage object to let other pages know
+    that a change in the Storage event has occured
+    - localStorage only supports strings. Use JSON.stringify() and JSON.parse() when working with arrays
+
