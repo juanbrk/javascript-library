@@ -111,9 +111,10 @@ function createCardFooter(book){
     editBtn.textContent = 'edit';
     editBtn.setAttribute('type','button');
 
-    let viewBtn = createElementWithClass('button', ['btn', 'btn-sm', 'btn-outline-secondary']);
-    viewBtn.textContent = 'view';
-    viewBtn.setAttribute('type','button');
+    let markAsReadButton = createElementWithClass('button', ['btn', 'btn-sm', 'btn-outline-secondary']);
+    markAsReadButton.textContent = book.isRead ?  '✅' : '👍' ;
+    markAsReadButton.setAttribute('type','button');
+
     
     let btnToRemoveBook = createElementWithClass('button', ['btn','btn-sm', 'btn-danger']);
     btnToRemoveBook.textContent = 'Remove';
@@ -121,8 +122,9 @@ function createCardFooter(book){
     let pagesText = createElementWithClass('small', ['text-muted', 'text-decoration-none']);
     pagesText.textContent = `${book.numPages} Pages`;
 
-    let btnGroup = appendChild(footerBtnGroup, [editBtn, viewBtn]);
+    let btnGroup = appendChild(footerBtnGroup, [editBtn, markAsReadButton]);
     let footer = appendChild(cardFooter, [btnGroup, btnToRemoveBook]);
+
 
     return footer;
 
@@ -251,8 +253,8 @@ function renderBook(book){
 
     // provide remove-btn with functionality
     // THIS IS SO CUMBERSOME AND HARD TO READ+
-    let removeCardBtn = bookRender.lastChild.lastChild.lastElementChild.lastElementChild;
-    removeCardBtn.addEventListener('click', element => removeBook(element.currentTarget))
+    addFunctionalityToButtons(bookRender);
+    
     return bookRender;
 }
 
@@ -272,6 +274,42 @@ function createCard(book){
     let card = appendChild(cardBody, [cardTitle, cardAuthor, cardPages, footer]);
     
     return card;
+
+}
+
+
+/**
+ * When a card is created, functionality needs to be binded to each button in order to 
+ * perform desired actions such as removing a book. 
+ */
+function addFunctionalityToButtons(bookCard){
+    const cardFooter = Array.from(bookCard.lastChild.lastChild.lastElementChild.childNodes);
+    //remove book
+    let removeCardBtn = cardFooter[1];
+    removeCardBtn.addEventListener('click', element => removeBook(element.currentTarget))
+    
+    // mark book as read
+    const markAsReadButton = cardFooter[0].lastElementChild;
+    markAsReadButton.addEventListener('click', element => markBookAsRead(element.currentTarget))
+
+}
+
+/**
+ * When user clicks on the mark-as-read button, toggle if book has been read or not
+ * @param {Object} cardButtonPressed HTML <button> that has been pressed
+ */
+function markBookAsRead(cardButtonPressed){
+    const cardElement = cardButtonPressed.offsetParent.offsetParent.offsetParent;
+    const idOfBookToMarkAsRead = cardElement.dataset.bookId;
+    // TODO: ask for confirmation
+    myLibrary = myLibrary.map( book => {
+        if (book.id === idOfBookToMarkAsRead) {
+            book.isRead = !(book.isRead)
+            // Switch btn to display the green tick
+            cardButtonPressed.textContent = book.isRead ? '✅' : '👍' ;
+        } 
+        return book
+    } );
 
 }
 
